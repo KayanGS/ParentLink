@@ -71,6 +71,12 @@ fun OrganizerLoginScreen(
 
         Spacer(modifier = Modifier.height(40.dp))
 
+        Text(
+            text = "Organizing Event Login",
+            fontSize = 20.sp,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
