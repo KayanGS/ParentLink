@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
@@ -33,7 +34,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
+
+@SuppressLint("UseOfNonLambdaOffsetOverload")
 @Composable
 fun OrganizerLoginScreen(
     onLoginSuccess: () -> Unit = {},
@@ -45,6 +49,8 @@ fun OrganizerLoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var loading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val offsetY by animateDpAsState(
         targetValue = 0.dp,
@@ -100,6 +106,7 @@ fun OrganizerLoginScreen(
 
         Button(
             onClick = {
+                keyboardController?.hide()
                 if (email.isNotBlank() && password.isNotBlank()) {
                     loading = true
                     auth.signInWithEmailAndPassword(email, password)
@@ -109,11 +116,7 @@ fun OrganizerLoginScreen(
                                 Toast.makeText(context, "Login success", Toast.LENGTH_SHORT).show()
                                 onLoginSuccess()
                             } else {
-                                Toast.makeText(
-                                    context,
-                                    "Invalid email or password.",
-                                    Toast.LENGTH_LONG
-                                ).show()
+                                errorMessage = "Invalid email or password."
                             }
                         }
                 } else {
@@ -124,6 +127,14 @@ fun OrganizerLoginScreen(
             enabled = !loading
         ) {
             Text(if (loading) "Logging in..." else "Login")
+        }
+
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage ?: "",
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))

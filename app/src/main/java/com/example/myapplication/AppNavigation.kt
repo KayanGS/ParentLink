@@ -39,10 +39,6 @@ fun AppNavigation() {
                 }
             )
         }
-
-        composable("organizerDashboard") {
-            // Screen 1.3 – Organizer Dashboard TODO
-        }
         composable("organizerDashboard") {
             OrganizerDashboardScreen(
                 onLogout = { navController.navigate("welcome") },
@@ -53,5 +49,14 @@ fun AppNavigation() {
                 onViewFeedback = { navController.navigate("viewFeedback") }
             )
         }
+        composable("createPlayDate") {
+            CreatePlayDateEventScreen(
+                onBackToDashboard = {
+                    navController.navigate("organizerDashboard")
+                }
+            )
+
+        }
     }
 }
+

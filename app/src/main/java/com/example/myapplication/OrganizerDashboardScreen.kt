@@ -63,6 +63,7 @@ fun OrganizerDashboardScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 12.dp)
+
         ) {
             Text("Create a Play Date Event Record")
         }
