@@ -24,15 +24,13 @@ fun OrganizerDashboardScreen(
             .fillMaxSize()
             .padding(24.dp)
     ) {
-
         ScreenHeader(
-            title = "Create a Play Date Event Screen",
+            title = "Organizer Dashboard Screen",
             onLogoutClick = {
                 auth.signOut()
                 onLogout()
             }
         )
-
 
         Button(
             onClick = onPlayDateCreate,
