@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.presentation.ui.organizer
 
 import android.annotation.SuppressLint
 import android.widget.Toast
@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import com.example.myapplication.R
 
 
 @SuppressLint("UseOfNonLambdaOffsetOverload")

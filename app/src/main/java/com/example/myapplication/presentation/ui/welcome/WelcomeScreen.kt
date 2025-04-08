@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.presentation.ui.welcome
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.R
 
 @Composable
 fun WelcomeScreen(
@@ -23,7 +24,6 @@ fun WelcomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Logo (coloque o arquivo na pasta drawable e use o nome certo abaixo)
         Image(
             painter = painterResource(id = R.drawable.parentlink_logo),
             contentDescription = "App Logo",
