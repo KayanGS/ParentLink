@@ -1,9 +1,14 @@
-package com.example.myapplication
-
+package com.example.myapplication.presentation.navigation
+    
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.presentation.ui.organizer.OrganizerDashboardScreen
+import com.example.myapplication.presentation.ui.organizer.OrganizerLoginScreen
+import com.example.myapplication.presentation.ui.organizer.ResetPasswordScreen
+import com.example.myapplication.presentation.ui.carpooling.CreatePlayDateEventScreen
+import com.example.myapplication.presentation.ui.welcome.WelcomeScreen
 
 @Composable
 fun AppNavigation() {
