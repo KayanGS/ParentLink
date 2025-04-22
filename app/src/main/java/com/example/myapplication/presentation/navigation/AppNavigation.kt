@@ -95,8 +95,15 @@ fun AppNavigation() {
             )
         }
 
-
-
+        composable("participantDashboard") {
+            ParticipatingDashboardScreen(
+                onLogout = { navController.navigate("participantLogin") },
+                onPlayDateClick = { navController.navigate("participantViewPlayDates") },
+                onCarpoolingClick = { navController.navigate("participantViewCarpooling") },
+                onPlayDateNotificationsClick = { navController.navigate("participantPlayDateNotifications") },
+                onCarpoolingNotificationsClick = { navController.navigate("participantCarpoolingNotifications") }
+            )
+        }
     }
 }
 

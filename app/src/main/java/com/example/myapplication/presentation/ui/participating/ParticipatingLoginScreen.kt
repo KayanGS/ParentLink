@@ -97,31 +97,14 @@ fun ParticipatingParentLoginScreen(
                 if (email.isNotBlank() && password.isNotBlank()) {
                     loading = true
                     auth.signInWithEmailAndPassword(email, password)
-                        .addOnSuccessListener { authResult ->
-                            val uid = authResult.user?.uid
-                            if (uid != null) {
-                                db.collection("Users")
-                                    .document(uid)
-                                    .get()
-                                    .addOnSuccessListener { document ->
-                                        val role = document.getString("role")
-                                        if (role == "participatingParentRole") {
-                                            Toast.makeText(context, "Login success", Toast.LENGTH_SHORT).show()
-                                            onLoginSuccess()
-                                        } else {
-                                            errorMessage = "Email and password do not match. Please, try again."
-                                            auth.signOut()
-                                        }
-                                        loading = false
-                                    }
-                                    .addOnFailureListener {
-                                        errorMessage = "Failed to verify role."
-                                        loading = false
-                                    }
-                            } else {
-                                errorMessage = "User ID not found."
-                                loading = false
-                            }
+                        .addOnSuccessListener {
+                            Toast.makeText(context, "Login success", Toast.LENGTH_SHORT).show()
+                            onLoginSuccess()
+                            loading = false
+                        }
+                        .addOnFailureListener {
+                            errorMessage = "Email and password do not match. Please, try again."
+                            loading = false
                         }
                         .addOnFailureListener {
                             errorMessage = "Email and password do not match. Please, try again."
