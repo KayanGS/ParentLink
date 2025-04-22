@@ -107,30 +107,15 @@ fun CreateCarpoolingEventScreen(
         )
 
         // PICK-UP TIME SLOTS
-        SharedTimeSlotPicker(
+        SharedSimpleTimeSlotPicker(
             amStartLabel = "Carpooling Pick-Up A.M. Start Time",
             pmStartLabel = "Carpooling Pick-Up P.M. Start Time",
-            amEndLabel = "Carpooling Pick-Up A.M. End Time",
-            pmEndLabel = "Carpooling Pick-Up P.M. End Time",
             amStartTime = slotAmStart,
             onAmStartTimeChange = { slotAmStart = it; slotPmStart = "" },
             pmStartTime = slotPmStart,
-            onPmStartTimeChange = { slotPmStart = it },
-            amEndTime = slotAmEnd,
-            onAmEndTimeChange = { slotAmEnd = it },
-            pmEndTime = slotPmEnd,
-            onPmEndTimeChange = { slotPmEnd = it },
-            errorMessage = errorMessage,
-            onErrorChange = { errorMessage = it }
+            onPmStartTimeChange = { slotPmStart = it }
         )
 
-        if (errorMessage.isNotBlank()) { // If there is an error message
-            Text(
-                text = errorMessage, // Display the error message
-                color = MaterialTheme.colorScheme.error, // Set the color to red
-                modifier = Modifier.padding(4.dp) // Add padding around the error message
-            )
-        }
 
         // MAX NUMBER OF SEATS IN THE CARPOOLING
         SharedNumberInputField(
@@ -179,21 +164,13 @@ fun CreateCarpoolingEventScreen(
 
             // RETURN TIME SLOTS
             // RETURN A.M. START TIME SLOT
-            SharedTimeSlotPicker(
+            SharedSimpleTimeSlotPicker(
                 amStartLabel = "Carpooling Return A.M. Start Time",
                 pmStartLabel = "Carpooling Return P.M. Start Time",
-                amEndLabel = "Carpooling Return A.M. End Time",
-                pmEndLabel = "Carpooling Return P.M. End Time",
-                amStartTime = slotAmStart,
-                onAmStartTimeChange = { slotAmStart = it; slotPmStart = "" },
-                pmStartTime = slotPmStart,
-                onPmStartTimeChange = { slotPmStart = it },
-                amEndTime = slotAmEnd,
-                onAmEndTimeChange = { slotAmEnd = it },
-                pmEndTime = slotPmEnd,
-                onPmEndTimeChange = { slotPmEnd = it },
-                errorMessage = errorMessage,
-                onErrorChange = { errorMessage = it }
+                amStartTime = returnAmStart,
+                onAmStartTimeChange = { returnAmStart = it; returnPmStart = "" },
+                pmStartTime = returnPmStart,
+                onPmStartTimeChange = { returnPmStart = it }
             )
         }
 

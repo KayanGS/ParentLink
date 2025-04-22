@@ -113,10 +113,10 @@ fun ParticipatingRegistrationScreen(
                                     "parentName" to parentName,
                                     "parentSurname" to parentSurname,
                                     "parentMobile" to parentMobile,
-                                    "username" to parentEmail,
-                                    "role" to "participatingParentRole"
+                                    "username" to parentEmail
                                 )
-                                db.collection("Participating childs parent").document(userId).set(data)
+                                // Usando a mesma collection como os organizadores (por exemplo: "Users")
+                                db.collection("Users").document(userId).set(data)
                                     .addOnSuccessListener {
                                         successMessage = "New Record for events participating child's parent successfully created."
                                         Toast.makeText(context, "Registered successfully!", Toast.LENGTH_SHORT).show()
