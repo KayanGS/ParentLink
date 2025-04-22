@@ -5,11 +5,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.presentation.ui.carpooling.CreateCarpoolingEventScreen
-import com.example.myapplication.presentation.ui.organizer.OrganizerDashboardScreen
-import com.example.myapplication.presentation.ui.organizer.OrganizerLoginScreen
-import com.example.myapplication.presentation.ui.organizer.ResetPasswordScreen
+import com.example.myapplication.presentation.ui.organizer.*
 import com.example.myapplication.presentation.ui.playdate.CreatePlayDateEventScreen
 import com.example.myapplication.presentation.ui.welcome.WelcomeScreen
+import com.example.myapplication.presentation.ui.participating.*
+
 
 @Composable
 fun AppNavigation() {
@@ -22,7 +22,7 @@ fun AppNavigation() {
                     navController.navigate("organizerLogin")
                 },
                 onParticipantLoginClick = {
-                    // TODO
+                    navController.navigate("participantLogin")
                 }
             )
         }
@@ -71,6 +71,30 @@ fun AppNavigation() {
                 onLogout = { navController.navigate("welcome") },
             )
         }
+        composable("participantLogin") {
+            ParticipatingParentLoginScreen(
+                onLoginSuccess = {
+                    navController.navigate("participantDashboard")
+                },
+                onGoToRegister = {
+                    navController.navigate("participantRegister")
+                },
+                onGoToResetPassword = {
+                    navController.navigate("resetPassword")
+                }
+            )
+        }
+
+        composable("participantRegister") {
+            ParticipatingRegistrationScreen(
+                onRegisterSuccess = {
+                    navController.navigate("participantLogin") {
+                        popUpTo("participantRegister") { inclusive = true }
+                    }
+                }
+            )
+        }
+
 
 
     }
