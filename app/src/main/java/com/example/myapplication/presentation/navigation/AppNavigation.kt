@@ -4,10 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.presentation.ui.carpooling.CreateCarpoolingEventScreen
 import com.example.myapplication.presentation.ui.organizer.OrganizerDashboardScreen
 import com.example.myapplication.presentation.ui.organizer.OrganizerLoginScreen
 import com.example.myapplication.presentation.ui.organizer.ResetPasswordScreen
-import com.example.myapplication.presentation.ui.carpooling.CreatePlayDateEventScreen
+import com.example.myapplication.presentation.ui.playdate.CreatePlayDateEventScreen
 import com.example.myapplication.presentation.ui.welcome.WelcomeScreen
 
 @Composable
@@ -58,10 +59,20 @@ fun AppNavigation() {
             CreatePlayDateEventScreen(
                 onBackToDashboard = {
                     navController.navigate("organizerDashboard")
-                }
+                },
+                onLogout = { navController.navigate("welcome") },
             )
-
         }
+        composable("createCarpooling") {
+            CreateCarpoolingEventScreen(
+                onBackToDashboard = {
+                    navController.navigate("organizerDashboard")
+                },
+                onLogout = { navController.navigate("welcome") },
+            )
+        }
+
+
     }
 }
 
