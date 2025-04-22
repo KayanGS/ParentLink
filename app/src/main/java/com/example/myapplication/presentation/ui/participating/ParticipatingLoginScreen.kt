@@ -1,56 +1,37 @@
-package com.example.myapplication.presentation.ui.organizer
+package com.example.myapplication.presentation.ui.participating
 
 import android.annotation.SuppressLint
 import android.widget.Toast
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.firebase.auth.FirebaseAuth
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import com.example.myapplication.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
-
-/**
- * Organizer Login Screen
- * @param onLoginSuccess Callback to be invoked when login is successful
- * @param onForgotPassword Callback to be invoked when forgot password is clicked
- */
 @SuppressLint("UseOfNonLambdaOffsetOverload")
 @Composable
-fun OrganizerLoginScreen(
+fun ParticipatingParentLoginScreen(
     onLoginSuccess: () -> Unit = {},
-    onForgotPassword: () -> Unit = {}
+    onGoToRegister: () -> Unit = {},
+    onGoToResetPassword: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -84,7 +65,7 @@ fun OrganizerLoginScreen(
         Spacer(modifier = Modifier.height(40.dp))
 
         Text(
-            text = "Organizing Event Login",
+            text = "Login Screen for Parent of Events Participating Child",
             fontSize = 20.sp,
             modifier = Modifier.padding(bottom = 16.dp)
         )
@@ -116,17 +97,38 @@ fun OrganizerLoginScreen(
                 if (email.isNotBlank() && password.isNotBlank()) {
                     loading = true
                     auth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener { task ->
-                            loading = false
-                            if (task.isSuccessful) {
-                                Toast.makeText(context, "Login success", Toast.LENGTH_SHORT).show()
-                                onLoginSuccess()
+                        .addOnSuccessListener { authResult ->
+                            val uid = authResult.user?.uid
+                            if (uid != null) {
+                                db.collection("Users")
+                                    .document(uid)
+                                    .get()
+                                    .addOnSuccessListener { document ->
+                                        val role = document.getString("role")
+                                        if (role == "participatingParentRole") {
+                                            Toast.makeText(context, "Login success", Toast.LENGTH_SHORT).show()
+                                            onLoginSuccess()
+                                        } else {
+                                            errorMessage = "Email and password do not match. Please, try again."
+                                            auth.signOut()
+                                        }
+                                        loading = false
+                                    }
+                                    .addOnFailureListener {
+                                        errorMessage = "Failed to verify role."
+                                        loading = false
+                                    }
                             } else {
-                                errorMessage = "Invalid email or password."
+                                errorMessage = "User ID not found."
+                                loading = false
                             }
                         }
+                        .addOnFailureListener {
+                            errorMessage = "Email and password do not match. Please, try again."
+                            loading = false
+                        }
                 } else {
-                    Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -135,7 +137,7 @@ fun OrganizerLoginScreen(
             Text(if (loading) "Logging in..." else "Login")
         }
 
-        if (errorMessage != null) {
+        if (!errorMessage.isNullOrBlank()) {
             Text(
                 text = errorMessage ?: "",
                 color = MaterialTheme.colorScheme.error,
@@ -143,14 +145,25 @@ fun OrganizerLoginScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "First-time User? Register HERE",
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 14.sp,
+            modifier = Modifier.clickable {
+                onGoToRegister()
+            }
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
 
         Text(
             text = "Forgotten Password? Re-set Password HERE",
             color = MaterialTheme.colorScheme.primary,
             fontSize = 14.sp,
             modifier = Modifier.clickable {
-                onForgotPassword()
+                onGoToResetPassword()
             }
         )
     }
