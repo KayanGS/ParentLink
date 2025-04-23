@@ -1,16 +1,13 @@
 package com.example.myapplication.presentation.ui.carpooling
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
 import com.example.myapplication.presentation.components.*
@@ -44,7 +41,6 @@ fun CreateCarpoolingEventScreen(
     var returnPmEnd by remember { mutableStateOf("") }
     var specialRequirements by remember { mutableStateOf("") }
     var showPopup by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
 
     val scrollState = rememberScrollState() // For scrolling the form
 // ###################################### END LOCAL VARIABLES #####################################

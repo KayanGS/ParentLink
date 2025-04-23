@@ -9,6 +9,7 @@ import com.example.myapplication.presentation.ui.organizer.*
 import com.example.myapplication.presentation.ui.playdate.CreatePlayDateEventScreen
 import com.example.myapplication.presentation.ui.welcome.WelcomeScreen
 import com.example.myapplication.presentation.ui.participating.*
+import android.util.Log
 
 
 @Composable
@@ -104,6 +105,34 @@ fun AppNavigation() {
                 onCarpoolingNotificationsClick = { navController.navigate("participantCarpoolingNotifications") }
             )
         }
+        composable("participantViewPlayDates") {
+            ParticipatingViewPlaydateScreen(
+                onLogout = { navController.navigate("participantLogin") },
+                onBackToDashboard = { navController.navigate("participantDashboard") },
+                onViewEventDetails = { event ->
+                    val eventRecordId = event["id"] as? String ?: ""
+                    val organizerId = event["organizerId"] as? String ?: ""
+                    navController.navigate("playDateDetails/$eventRecordId/$organizerId")
+                }
+            )
+        }
+        composable("playDateDetails/{eventRecordId}/{organizerId}") { backStackEntry ->
+            val eventRecordId = backStackEntry.arguments?.getString("eventRecordId") ?: ""
+            val organizerId = backStackEntry.arguments?.getString("organizerId") ?: ""
+
+            ParticipatingPlayDateDetailScreen(
+                eventRecordId = eventRecordId,
+                organizerId = organizerId,
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+
+
+
+
     }
 }
 
