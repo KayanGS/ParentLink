@@ -3,7 +3,6 @@ package com.example.myapplication.presentation.ui.playdate
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -27,6 +26,7 @@ fun CreatePlayDateEventScreen(
     // Form state
     var playDateType by remember { mutableStateOf("") }
     var playDateCat by remember { mutableStateOf("") }
+    var playDateVenue by remember { mutableStateOf("") }
     var playDateTitle by remember { mutableStateOf("") }
     var weekCommenceDate by remember { mutableStateOf("") }
     var dayOfWeek by remember { mutableStateOf("") }
@@ -76,6 +76,13 @@ fun CreatePlayDateEventScreen(
             listOf("Indoor", "Outdoor"), // Options for the dropdown
             playDateCat // Selected option
         ) { playDateCat = it } // Callback when an option is selected
+
+        // PLAY DATE VENUE
+        SharedTextField(
+            value = playDateVenue,
+            onValueChange = { playDateVenue = it },
+            label = "Enter Play Date Venue"
+        )
 
         // PLAY DATE TITLE
         SharedTextField(
@@ -146,6 +153,7 @@ fun CreatePlayDateEventScreen(
                 hashMapOf(
                     "organizerId" to uid,
                     "playDateTitle" to playDateTitle,
+                    "playDateVenue" to playDateVenue,
                     "playDateType" to playDateType,
                     "playDateCat" to playDateCat,
                     "weekCommenceDate" to weekCommenceDate,
