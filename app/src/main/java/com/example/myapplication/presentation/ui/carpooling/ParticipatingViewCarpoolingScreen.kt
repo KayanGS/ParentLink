@@ -1,4 +1,4 @@
-package com.example.myapplication.presentation.ui.participating
+package com.example.myapplication.presentation.ui.carpooling
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -13,7 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
-fun ParticipatingViewPlaydateScreen(
+fun ParticipatingViewCarpoolingScreen(
     onLogout: () -> Unit,
     onBackToDashboard: () -> Unit,
     onViewEventDetails: (Map<String, Any>) -> Unit
@@ -24,8 +24,6 @@ fun ParticipatingViewPlaydateScreen(
     var selectedWeek by remember { mutableStateOf("") }
     var events by remember { mutableStateOf<List<Map<String, Any>>>(emptyList()) }
     var selectedTitle by remember { mutableStateOf("") }
-    var selectedDate by remember { mutableStateOf("") }
-    var selectedTime by remember { mutableStateOf("") }
 
     val scrollState = rememberScrollState()
 
@@ -35,9 +33,8 @@ fun ParticipatingViewPlaydateScreen(
             .verticalScroll(scrollState)
             .padding(16.dp)
     ) {
-        // ✅ Corrected Header Title
         ScreenHeader(
-            title = "View List of Play Date Events",
+            title = "View List of Carpooling Events",
             onLogoutClick = {
                 auth.signOut()
                 onLogout()
@@ -46,12 +43,11 @@ fun ParticipatingViewPlaydateScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Week Commencing Dropdown
         SharedWeekCommencingField(
             selectedValue = selectedWeek,
             onValueChange = {
                 selectedWeek = it
-                db.collection("Posted Play Date Event Record")
+                db.collection("Posted Carpooling Event Record")
                     .whereEqualTo("weekCommenceDate", it)
                     .get()
                     .addOnSuccessListener { snapshot ->
@@ -72,7 +68,7 @@ fun ParticipatingViewPlaydateScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Select a Play Date Event from the List", style = MaterialTheme.typography.titleMedium)
+        Text("Select a Carpooling Event from the List", style = MaterialTheme.typography.titleMedium)
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -84,13 +80,11 @@ fun ParticipatingViewPlaydateScreen(
                 elevation = CardDefaults.cardElevation()
             ) {
                 Column(Modifier.padding(8.dp)) {
-                    Text("Title: ${event["playDateTitle"]}")
+                    Text("Title: ${event["carpoolingTitle"]}")
                     Text("Posted on: ${event["postedDate"]} at ${event["postedTime"]}")
                     Spacer(modifier = Modifier.height(4.dp))
                     Button(onClick = {
-                        selectedTitle = event["playDateTitle"] as String
-                        selectedDate = event["postedDate"] as String
-                        selectedTime = event["postedTime"] as String
+                        selectedTitle = event["carpoolingTitle"] as String
                         onViewEventDetails(event)
                     }) {
                         Text("View")
@@ -104,8 +98,6 @@ fun ParticipatingViewPlaydateScreen(
         Button(
             onClick = {
                 selectedTitle = ""
-                selectedDate = ""
-                selectedTime = ""
                 selectedWeek = ""
                 events = emptyList()
             },
@@ -113,7 +105,7 @@ fun ParticipatingViewPlaydateScreen(
                 .fillMaxWidth()
                 .padding(bottom = 8.dp)
         ) {
-            Text("Select Another Play Date Event to View")
+            Text("Select Another Carpooling Event to View")
         }
 
         Button(

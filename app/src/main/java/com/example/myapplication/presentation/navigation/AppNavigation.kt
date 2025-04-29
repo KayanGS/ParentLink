@@ -1,15 +1,20 @@
 package com.example.myapplication.presentation.navigation
-    
+
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.presentation.ui.carpooling.CreateCarpoolingEventScreen
+import com.example.myapplication.presentation.ui.carpooling.ParticipatingCarpoolingDetailScreen
+import com.example.myapplication.presentation.ui.carpooling.ParticipatingRequestCarpoolingScreen
+import com.example.myapplication.presentation.ui.carpooling.ParticipatingViewCarpoolingScreen
 import com.example.myapplication.presentation.ui.organizer.*
 import com.example.myapplication.presentation.ui.playdate.CreatePlayDateEventScreen
 import com.example.myapplication.presentation.ui.welcome.WelcomeScreen
 import com.example.myapplication.presentation.ui.participating.*
-import android.util.Log
+import com.example.myapplication.presentation.ui.playdate.*
+import com.example.myapplication.presentation.ui.participating.*
+
 
 
 @Composable
@@ -113,9 +118,11 @@ fun AppNavigation() {
                     val eventRecordId = event["id"] as? String ?: ""
                     val organizerId = event["organizerId"] as? String ?: ""
                     navController.navigate("playDateDetails/$eventRecordId/$organizerId")
+                    println("OrganizerId being passed: $organizerId")
                 }
             )
         }
+
         composable("playDateDetails/{eventRecordId}/{organizerId}") { backStackEntry ->
             val eventRecordId = backStackEntry.arguments?.getString("eventRecordId") ?: ""
             val organizerId = backStackEntry.arguments?.getString("organizerId") ?: ""
@@ -125,7 +132,138 @@ fun AppNavigation() {
                 organizerId = organizerId,
                 onBack = {
                     navController.popBackStack()
+                },
+                onRequestClick = {
+                    navController.navigate("playDateRequest/$eventRecordId")
                 }
+            )
+        }
+
+        composable("playDateRequest/{eventRecordId}") { backStackEntry ->
+            val eventRecordId = backStackEntry.arguments?.getString("eventRecordId") ?: ""
+            ParticipatingRequestPlayDateScreen(
+                eventRecordId = eventRecordId,
+                onBack = {
+                    navController.navigate("participantViewPlayDates") {
+                        popUpTo("participantViewPlayDates") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+// View list of carpooling events
+        composable("participantViewCarpooling") {
+            ParticipatingViewCarpoolingScreen(
+                onLogout = { navController.navigate("participantLogin") },
+                onBackToDashboard = { navController.navigate("participantDashboard") },
+                onViewEventDetails = { event ->
+                    val eventRecordId = event["id"] as? String ?: ""
+                    val organizerId = event["organizerId"] as? String ?: ""
+                    navController.navigate("carpoolingDetails/$eventRecordId/$organizerId")
+                }
+            )
+        }
+
+// View carpooling event details
+        composable("carpoolingDetails/{eventRecordId}/{organizerId}") { backStackEntry ->
+            val eventRecordId = backStackEntry.arguments?.getString("eventRecordId") ?: ""
+            val organizerId = backStackEntry.arguments?.getString("organizerId") ?: ""
+
+            ParticipatingCarpoolingDetailScreen(
+                eventRecordId = eventRecordId,
+                organizerId = organizerId,
+                onBack = {
+                    navController.popBackStack()
+                },
+                onRequestClick = {
+                    navController.navigate("carpoolingRequest/$eventRecordId")
+                }
+            )
+        }
+
+        composable("carpoolingRequest/{eventRecordId}") { backStackEntry ->
+            val eventRecordId = backStackEntry.arguments?.getString("eventRecordId") ?: ""
+            ParticipatingRequestCarpoolingScreen(
+                eventRecordId = eventRecordId,
+                onBack = {
+                    navController.navigate("participantViewCarpooling") {
+                        popUpTo("participantViewCarpooling") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable("viewPlayDateRequests") {
+            ViewPlayDateRequestsScreen(
+                navController = navController,
+                onLogout = { navController.navigate("welcome") },
+                onBackToDashboard = { navController.navigate("organizerDashboard") }
+            )
+        }
+
+        composable("viewPlayDateRequestDetails/{requestId}") { backStackEntry ->
+            val requestId = backStackEntry.arguments?.getString("requestId") ?: ""
+            ViewPlayDateRequestDetailsScreen(
+                requestId = requestId,
+                onBackToList = {
+                    navController.navigate("viewPlayDateRequests") {
+                        popUpTo("viewPlayDateRequests") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable("viewCarpoolingRequests") {
+            ViewCarpoolingRequestsScreen(
+                navController = navController,
+                onLogout = { navController.navigate("welcome") },
+                onBackToDashboard = { navController.navigate("organizerDashboard") }
+            )
+        }
+
+        composable("viewCarpoolingRequestDetails/{requestId}") { backStackEntry ->
+            val requestId = backStackEntry.arguments?.getString("requestId") ?: ""
+            ViewCarpoolingRequestDetailsScreen(
+                requestId = requestId,
+                onBackToList = {
+                    navController.navigate("viewCarpoolingRequests") {
+                        popUpTo("viewCarpoolingRequests") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+
+        composable("participantPlayDateNotifications") {
+            ParticipatingPlayDateNotificationsScreen(
+                navController = navController,
+                onLogout = { navController.navigate("participantLogin") },
+                onBackToDashboard = { navController.navigate("participantDashboard") }
+            )
+        }
+
+        composable("viewPlayDateNotificationDetails/{notificationId}") { backStackEntry ->
+            val notificationId = backStackEntry.arguments?.getString("notificationId") ?: ""
+            ParticipatingPlayDateNotificationDetailsScreen(
+                notificationId = notificationId,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+
+        composable("participantCarpoolingNotifications") {
+            ParticipatingCarpoolingNotificationsScreen(
+                navController = navController,
+                onLogout = { navController.navigate("participantLogin") },
+                onBackToDashboard = { navController.navigate("participantDashboard") }
+            )
+        }
+
+        composable("viewCarpoolingNotificationDetails/{notificationId}") { backStackEntry ->
+            val notificationId = backStackEntry.arguments?.getString("notificationId") ?: ""
+            ParticipatingCarpoolingNotificationDetailsScreen(
+                notificationId = notificationId,
+                onBack = { navController.popBackStack() }
             )
         }
 
