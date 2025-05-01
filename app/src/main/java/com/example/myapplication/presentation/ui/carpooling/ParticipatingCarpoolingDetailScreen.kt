@@ -13,6 +13,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 fun ParticipatingCarpoolingDetailScreen(
     eventRecordId: String,
     organizerId: String,
+    onLogout: () -> Unit,
     onBack: () -> Unit,
     onRequestClick: () -> Unit
 ) {
@@ -49,38 +50,36 @@ fun ParticipatingCarpoolingDetailScreen(
         .fillMaxSize()
         .padding(16.dp)) {
 
-        ScreenHeader(title = "Selected Carpooling Event Details", onLogoutClick = {
+        ScreenHeader(title = "Selected Carpooling Event Details",
+            onLogoutClick = {
             auth.signOut()
-            onBack()
+            onLogout()
         })
 
         Spacer(modifier = Modifier.height(16.dp))
 
         eventData?.let { data ->
-            Text("Title: ${data["carpoolingTitle"]}")
+            Text("Carpooling Event Title: ${data["carpoolingTitle"]}")
             Text("Organising Parent: $organizerName")
-            Text("Date: ${data["date"]}")
-            Text("Day of Week: ${data["dayOfWeek"]}")
-            Text("Pick-up: ${data["pickup"]}")
-            Text("Destination: ${data["destination"]}")
-            Text("Start Time: ${data["startTime"]}")
-            Text("End Time: ${data["endTime"]}")
-            Text("Max Seats: ${data["maxSeats"]}")
-            Text("Remaining Seats: ${data["remainingSeats"]}")
-            Text("Age Group: ${data["ageGroup"]}")
-
-            val specialReq = data["specialRequirements"] as? String
-            if (!specialReq.isNullOrBlank()) {
-                Text("Special Requirements: $specialReq")
-            }
+            Text("Age Group Suitability: ${data["ageGroup"]}")
+            Text("Carpooling Event Date: ${data["date"]}")
+            Text("Carpooling Day of the Week: ${data["dayOfWeek"]}")
+            Text("Carpooling Event Start Time: ${data["startTime"]}")
+            Text("Carpooling Event Pick-up Point: ${data["pickup"]}")
+            Text("Carpooling Event Destination Point: ${data["destination"]}")
+            Text("Maximum Number of Seats Available: ${data["maxSeats"]}")
+            Text("Remaining Number of Seats Available: ${data["remainingSeats"]}")
 
             val returnJourney = data["returnJourney"] as? String
             if (returnJourney == "Yes") {
                 Spacer(modifier = Modifier.height(8.dp))
-                Text("Return Pick-up: ${data["returnPickup"]}")
-                Text("Return Destination: ${data["returnDestination"]}")
-                Text("Return Start Time: ${data["returnStartTime"]}")
-                Text("Return End Time: ${data["returnEndTime"]}")
+                Text("Carpooling Event Return Journey Pick-up Point: ${data["returnPickup"]}")
+                Text("Carpooling Event Return Journey Start Time: ${data["returnStartTime"]}")
+            }
+
+            val specialReq = data["specialRequirements"] as? String
+            if (!specialReq.isNullOrBlank()) {
+                Text("Carpooling Event Special Requirements: $specialReq")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -95,5 +94,6 @@ fun ParticipatingCarpoolingDetailScreen(
                 Text("Back to List of Carpooling Events")
             }
         } ?: Text("Loading event details...")
+
     }
 }

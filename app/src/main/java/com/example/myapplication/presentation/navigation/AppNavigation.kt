@@ -4,17 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.presentation.ui.carpooling.CreateCarpoolingEventScreen
-import com.example.myapplication.presentation.ui.carpooling.ParticipatingCarpoolingDetailScreen
-import com.example.myapplication.presentation.ui.carpooling.ParticipatingRequestCarpoolingScreen
-import com.example.myapplication.presentation.ui.carpooling.ParticipatingViewCarpoolingScreen
+import com.example.myapplication.presentation.ui.carpooling.*
 import com.example.myapplication.presentation.ui.organizer.*
-import com.example.myapplication.presentation.ui.playdate.CreatePlayDateEventScreen
 import com.example.myapplication.presentation.ui.welcome.WelcomeScreen
 import com.example.myapplication.presentation.ui.participating.*
 import com.example.myapplication.presentation.ui.playdate.*
-import com.example.myapplication.presentation.ui.participating.*
-
 
 
 @Composable
@@ -103,7 +97,7 @@ fun AppNavigation() {
 
         composable("participantDashboard") {
             ParticipatingDashboardScreen(
-                onLogout = { navController.navigate("participantLogin") },
+                onLogout = { navController.navigate("welcome") },
                 onPlayDateClick = { navController.navigate("participantViewPlayDates") },
                 onCarpoolingClick = { navController.navigate("participantViewCarpooling") },
                 onPlayDateNotificationsClick = { navController.navigate("participantPlayDateNotifications") },
@@ -112,7 +106,7 @@ fun AppNavigation() {
         }
         composable("participantViewPlayDates") {
             ParticipatingViewPlaydateScreen(
-                onLogout = { navController.navigate("participantLogin") },
+                onLogout = { navController.navigate("welcome") },
                 onBackToDashboard = { navController.navigate("participantDashboard") },
                 onViewEventDetails = { event ->
                     val eventRecordId = event["id"] as? String ?: ""
@@ -154,7 +148,7 @@ fun AppNavigation() {
 // View list of carpooling events
         composable("participantViewCarpooling") {
             ParticipatingViewCarpoolingScreen(
-                onLogout = { navController.navigate("participantLogin") },
+                onLogout = { navController.navigate("welcome") },
                 onBackToDashboard = { navController.navigate("participantDashboard") },
                 onViewEventDetails = { event ->
                     val eventRecordId = event["id"] as? String ?: ""
@@ -177,7 +171,13 @@ fun AppNavigation() {
                 },
                 onRequestClick = {
                     navController.navigate("carpoolingRequest/$eventRecordId")
+                },
+                onLogout = {
+                    navController.navigate("welcome") {
+                        popUpTo("welcome") { inclusive = true }
+                    }
                 }
+
             )
         }
 
@@ -189,9 +189,15 @@ fun AppNavigation() {
                     navController.navigate("participantViewCarpooling") {
                         popUpTo("participantViewCarpooling") { inclusive = true }
                     }
+                },
+                onLogout = {
+                    navController.navigate("welcome") {
+                        popUpTo("welcome") { inclusive = true }
+                    }
                 }
             )
         }
+
 
         composable("viewPlayDateRequests") {
             ViewPlayDateRequestsScreen(
@@ -229,6 +235,11 @@ fun AppNavigation() {
                     navController.navigate("viewCarpoolingRequests") {
                         popUpTo("viewCarpoolingRequests") { inclusive = true }
                     }
+                },
+                onLogout = {
+                    navController.navigate("welcome") {
+                        popUpTo("welcome") { inclusive = true }
+                    }
                 }
             )
         }
@@ -263,7 +274,12 @@ fun AppNavigation() {
             val notificationId = backStackEntry.arguments?.getString("notificationId") ?: ""
             ParticipatingCarpoolingNotificationDetailsScreen(
                 notificationId = notificationId,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onLogout = {
+                    navController.navigate("welcome") {
+                        popUpTo("welcome") { inclusive = true }
+                    }
+                }
             )
         }
 

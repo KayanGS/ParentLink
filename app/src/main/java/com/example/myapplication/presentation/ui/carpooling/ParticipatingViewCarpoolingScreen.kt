@@ -68,7 +68,8 @@ fun ParticipatingViewCarpoolingScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Select a Carpooling Event from the List", style = MaterialTheme.typography.titleMedium)
+        Text("Select a Carpooling Event from the List",
+            style = MaterialTheme.typography.titleMedium)
 
         Spacer(modifier = Modifier.height(8.dp))
 

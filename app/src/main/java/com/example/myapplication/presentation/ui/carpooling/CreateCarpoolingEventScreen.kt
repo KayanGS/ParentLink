@@ -200,6 +200,8 @@ fun CreateCarpoolingEventScreen(
                     "returnDestination" to if (returnYN == "Yes") returnDestination else null,
                     "returnStartTime" to if (returnYN == "Yes") (returnAmStart.ifBlank { returnPmStart }) else null,
                     "returnEndTime" to if (returnYN == "Yes") (returnAmEnd.ifBlank { returnPmEnd }) else null,
+                    "returnMaxSeats" to if (returnYN == "Yes") maxSeats else null,
+                    "returnRemainingSeats" to if (returnYN == "Yes") maxSeats else null,
                     "specialRequirements" to specialRequirements.ifBlank { null },
                     "postedDate" to SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date()),
                     "postedTime" to SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
