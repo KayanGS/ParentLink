@@ -1,5 +1,5 @@
 // ViewCarpoolingRequestDetailsScreen.kt
-package com.example.myapplication.presentation.ui.organizer
+package com.example.myapplication.presentation.ui.carpooling
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.verticalScroll
@@ -17,7 +17,8 @@ import java.util.*
 @Composable
 fun ViewCarpoolingRequestDetailsScreen(
     requestId: String,
-    onBackToList: () -> Unit
+    onBackToList: () -> Unit,
+    onLogout: () -> Unit
 ) {
     val db = FirebaseFirestore.getInstance()
     val auth = FirebaseAuth.getInstance()
@@ -74,7 +75,7 @@ fun ViewCarpoolingRequestDetailsScreen(
             title = "Carpooling Request Details",
             onLogoutClick = {
                 auth.signOut()
-                onBackToList()
+                onLogout()
             }
         )
 
@@ -85,9 +86,10 @@ fun ViewCarpoolingRequestDetailsScreen(
             val siblingName = requestData!!["siblingName"] as? String ?: ""
             val specialNeeds = requestData!!["specialNeeds"] as? String ?: "No"
             val specialNeedsDesc = requestData!!["specialNeedsDesc"] as? String ?: ""
-            val requestedPlaces = (requestData!!["requestedPlaces"] as? String)?.toIntOrNull() ?: 1
-            val returnRequired = requestData!!["requiredReturn"] as? String ?: "Yes"
-            val requestedReturnSeats = (requestData!!["requiredSeatsReturn"] as? String)?.toIntOrNull() ?: 1
+            val requestedPlaces = (requestData!!["requestedSeats"] as? String)?.toIntOrNull() ?: 1
+            val returnRequired = requestData!!["requiredReturnJourney"] as? String ?: "No"
+            val requestedReturnSeats = (requestData!!["requiredSeatsReturn"] as? String)?.toIntOrNull()
+
 
             Text("Carpooling Title: ${eventData!!["carpoolingTitle"]}")
             Text("Organising Parent: $organizerName")
@@ -106,9 +108,15 @@ fun ViewCarpoolingRequestDetailsScreen(
             // 🔵 Message Creation
             val requestText = buildString {
                 append("Dear $organizerName,\n")
-                append("I would like to place a request for my child $childName to participate in the carpooling event \"${eventData!!["carpoolingTitle"]}\" from ${eventData!!["pickup"]} to ${eventData!!["destination"]} on ${eventData!!["date"]}.")
+                append("I would like to place a request for my child $childName to participate " +
+                        "in the carpooling event \"${eventData!!["carpoolingTitle"]}\" from " +
+                        "${eventData!!["pickup"]} to ${eventData!!["destination"]} on " +
+                        "${eventData!!["date"]}.")
                 append(" My request is for $requestedPlaces seat(s).")
-                if (returnRequired == "Yes") append(" Return journey also required for $requestedReturnSeats seat(s).")
+                if (returnRequired == "Yes" && requestedReturnSeats != null) {
+                    append(" Return journey also required for $requestedReturnSeats seat(s).")
+                }
+
                 if (siblingName.isNotBlank()) append(" $childName has a sibling $siblingName.")
                 if (specialNeeds == "Yes") append(" Special needs: $specialNeedsDesc.")
                 append("\n\nKind regards,\n$parentName $parentSurname")
@@ -129,10 +137,28 @@ fun ViewCarpoolingRequestDetailsScreen(
 
                 val notificationText = buildString {
                     append("Dear $parentName $parentSurname,\n")
-                    append("Your request for $childName to join the carpooling event \"${eventData!!["carpoolingTitle"]}\" has been accepted.")
-                    if (returnRequired == "Yes") append(" Return journey is also confirmed.")
-                    append("\n\nWith kind regards,\n$organizerName")
+                    append("Your request for $childName to participate in the carpooling event " +
+                            "\"${eventData!!["carpoolingTitle"]}\" on ${eventData!!["date"]}, " +
+                            "starting at ${eventData!!["startTime"]}, with pick up point " +
+                            "${eventData!!["pickup"]} to destination point " +
+                            "${eventData!!["destination"]} for required $requestedPlaces seat(s) " +
+                            "on the event, ")
+
+                    if (returnRequired == "No") { append (" have been accepted")}
+                    if (returnRequired == "Yes" && (requestedReturnSeats ?: 0) > 0) {
+                        val returnStartTime = eventData!!["returnStartTime"] as? String ?: "[Return Time Missing]"
+                        append(" together with the Request for Return Journey starting at " +
+                                "$returnStartTime for required $requestedReturnSeats seat(s) have been accepted.")
+                    }
+                    append(" We are looking forward to welcome $childName on the event")
+
+                    if (siblingName.isNotBlank()) {
+                        append(" with $siblingName")
+                    }
+
+                    append(".\n\nWith kind regards,\n$organizerName")
                 }
+
 
                 popupNotificationText = notificationText
                 popupNotificationDate = notificationDate
@@ -178,9 +204,34 @@ fun ViewCarpoolingRequestDetailsScreen(
 
                     val notificationText = buildString {
                         append("Dear $parentName $parentSurname,\n")
-                        append("We regret to inform you that your request for $childName to join the carpooling event \"${eventData!!["carpoolingTitle"]}\" has been rejected.")
-                        if (returnRequired == "Yes") append(" This also applies to the return journey.")
-                        append("\n\nWith kind regards,\n$organizerName")
+                        append("Your request for $childName to participate in the carpooling " +
+                                "event \"${eventData!!["carpoolingTitle"]}\" on " +
+                                "${eventData!!["date"]}, starting at ${eventData!!["startTime"]}" +
+                                ", with pick up point ${eventData!!["pickup"]} to destination " +
+                                "point ${eventData!!["destination"]} for required " +
+                                "$requestedPlaces seat(s) on the event, " )
+
+                        if (returnRequired == "Yes" && (requestedReturnSeats ?: 0) > 0) {
+                            val returnStartTime = eventData!!["returnStartTime"] as? String ?: "[Return Time Missing]"
+                            append("and Return Journey starting at $returnStartTime for required " +
+                                    "$requestedReturnSeats ")
+                        }
+
+                        append("regrettably have been rejected entirely for lack of available " +
+                                "seats.\n")
+
+                        append("However we hope to welcome $childName")
+
+                        if (siblingName.isNotBlank()) {
+                            append(" with $siblingName")
+                        }
+
+                        append(" to another carpooling event that we organise")
+
+                        if (returnRequired == "No") { append (" have been accepted")}
+
+                        append(".\n\nWith kind regards,\n$organizerName")
+
                     }
 
                     popupNotificationText = notificationText

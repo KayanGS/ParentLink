@@ -15,7 +15,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 @Composable
 fun ParticipatingCarpoolingNotificationDetailsScreen(
     notificationId: String,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onLogout: () -> Unit
 ) {
     val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
@@ -41,7 +42,7 @@ fun ParticipatingCarpoolingNotificationDetailsScreen(
             title = "Notification Details",
             onLogoutClick = {
                 auth.signOut()
-                onBack()
+                onLogout()
             }
         )
 

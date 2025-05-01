@@ -24,18 +24,20 @@ fun SharedTimeSlotPicker(
     errorMessage: String,
     onErrorChange: (String) -> Unit
 ) {
-    // A.M. START
-    SharedDropdownField(
-        amStartLabel,
-        listOf("09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30"),
-        amStartTime
-    ) {
-        onAmStartTimeChange(it)
-        onPmStartTimeChange("")
+    // 🔹 START TIME PICKERS
+    if (pmStartTime.isBlank()) {
+        SharedDropdownField(
+            amStartLabel,
+            listOf("09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30"),
+            amStartTime
+        ) {
+            onAmStartTimeChange(it)
+            onPmStartTimeChange("")
+        }
     }
 
-    // P.M. START
     if (amStartTime.isBlank()) {
+
         SharedDropdownField(
             pmStartLabel,
             listOf("13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00"),
@@ -45,40 +47,49 @@ fun SharedTimeSlotPicker(
         }
     }
 
-    // A.M. END
-    if (amStartTime.isNotBlank()) {
-        SharedDropdownField(
-            amEndLabel,
-            listOf("10:00", "10:30", "11:00", "11:30", "12:00", "12:30"),
-            amEndTime
-        ) {
-            if (it <= amStartTime) {
-                onErrorChange("${'$'}amEndLabel must be after Start Time")
-                onAmEndTimeChange("")
-            } else {
-                onErrorChange("")
-                onAmEndTimeChange(it)
+    // 🔹 END TIME PICKERS
+    if (amStartTime.isNotBlank() || pmStartTime.isNotBlank()) {
+
+        // AM End Time
+        if (pmEndTime.isBlank() && pmStartTime.isBlank()) {
+            SharedDropdownField(
+                amEndLabel,
+                listOf("10:00", "10:30", "11:00", "11:30", "12:00", "12:30"),
+                amEndTime
+            ) {
+                val startTime = amStartTime.ifBlank { pmStartTime }
+                if (it <= startTime) {
+                    onErrorChange("$amEndLabel must be after start time")
+                    onAmEndTimeChange("")
+                } else {
+                    onErrorChange("")
+                    onAmEndTimeChange(it)
+                    onPmEndTimeChange("") // hide PM end
+                }
+            }
+        }
+
+        // PM End Time
+        if (amEndTime.isBlank()) {
+            SharedDropdownField(
+                pmEndLabel,
+                listOf("14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00"),
+                pmEndTime
+            ) {
+                val startTime = amStartTime.ifBlank { pmStartTime }
+                if (it <= startTime) {
+                    onErrorChange("$pmEndLabel must be after start time")
+                    onPmEndTimeChange("")
+                } else {
+                    onErrorChange("")
+                    onPmEndTimeChange(it)
+                    onAmEndTimeChange("") // hide AM end
+                }
             }
         }
     }
 
-    // P.M. END
-    if (amStartTime.isNotBlank()) {
-        SharedDropdownField(
-            pmEndLabel,
-            listOf("14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00"),
-            pmEndTime
-        ) {
-            if (it <= pmStartTime) {
-                onErrorChange("${'$'}pmEndLabel must be after Start Time")
-                onPmEndTimeChange("")
-            } else {
-                onErrorChange("")
-                onPmEndTimeChange(it)
-            }
-        }
-    }
-
+    // 🔹 Error message
     if (errorMessage.isNotBlank()) {
         Text(
             text = errorMessage,
@@ -87,6 +98,7 @@ fun SharedTimeSlotPicker(
         )
     }
 }
+
 
 @Composable
 fun SharedSimpleTimeSlotPicker(

@@ -1,4 +1,4 @@
-package com.example.myapplication.presentation.ui.organizer
+package com.example.myapplication.presentation.ui.playdate
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.presentation.components.ScreenHeader
+import com.example.myapplication.presentation.ui.organizer.NotificationRequestPopup
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
@@ -116,8 +117,15 @@ fun ViewPlayDateRequestDetailsScreen(
 
                 val notificationText = buildString {
                     append("Dear $parentName $parentSurname,\n")
-                    append("Your request for $childName to participate in the event \"${eventData!!["playDateTitle"]}\" of category ${eventData!!["playDateCat"]}, type ${eventData!!["playDateType"]} on ${eventData!!["date"]}, starting at ${eventData!!["startTime"]} in ${eventData!!["playDateVenue"]} for required $requestedPlaces places has been accepted.")
-                    if (siblingName.isNotBlank()) append(" We are looking forward to welcome $childName with $siblingName.")
+                    append("Your request for $childName to participate in the event " +
+                            "\"${eventData!!["playDateTitle"]}\" of category " +
+                            "${eventData!!["playDateCat"]}, type ${eventData!!["playDateType"]} " +
+                            "on ${eventData!!["date"]}, starting at ${eventData!!["startTime"]} " +
+                            "in ${eventData!!["playDateVenue"]} for required $requestedPlaces " +
+                            "places has been accepted.\n")
+                    append("We are looking forward to welcome $childName")
+                    if (siblingName.isBlank()) append(".")
+                    if (siblingName.isNotBlank()) append(" with $siblingName.")
                     append("\n\nWith kind regards,\n$organizerName")
                 }
 
@@ -172,9 +180,16 @@ fun ViewPlayDateRequestDetailsScreen(
 
                     val notificationText = buildString {
                         append("Dear $parentName $parentSurname,\n")
-                        append("We regret to inform you that your request for $childName to participate in the event \"${eventData!!["playDateTitle"]}\" of category ${eventData!!["playDateCat"]}, type ${eventData!!["playDateType"]} on ${eventData!!["date"]}, starting at ${eventData!!["startTime"]} in ${eventData!!["playDateVenue"]} has been rejected.")
-                        if (siblingName.isNotBlank()) append(" This includes sibling $siblingName.")
-                        append("\n\nWith kind regards,\n$organizerName")
+                        append("Your request for $childName to participate in the event " +
+                                "\"${eventData!!["playDateTitle"]}\" of category " +
+                                "${eventData!!["playDateCat"]}, type " +
+                                "${eventData!!["playDateType"]} on ${eventData!!["date"]}, " +
+                                "starting at ${eventData!!["startTime"]} in " +
+                                "${eventData!!["playDateVenue"]} for required " +
+                                "${requestData!!["requestedPlaces"]} places on the event, " +
+                                "regrettably has been rejected entirely for lack of available " +
+                                "places. \n However, we hope to welcome $childName at another " +
+                                "event that we organise.\n With kind regards, \n $organizerName")
                     }
 
                     popupNotificationText = notificationText

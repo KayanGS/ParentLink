@@ -13,6 +13,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 fun ParticipatingCarpoolingDetailScreen(
     eventRecordId: String,
     organizerId: String,
+    onLogout: () -> Unit,
     onBack: () -> Unit,
     onRequestClick: () -> Unit
 ) {
@@ -49,9 +50,10 @@ fun ParticipatingCarpoolingDetailScreen(
         .fillMaxSize()
         .padding(16.dp)) {
 
-        ScreenHeader(title = "Selected Carpooling Event Details", onLogoutClick = {
+        ScreenHeader(title = "Selected Carpooling Event Details",
+            onLogoutClick = {
             auth.signOut()
-            onBack()
+            onLogout()
         })
 
         Spacer(modifier = Modifier.height(16.dp))

@@ -1,5 +1,5 @@
 // NotificationRequestPopupCarpooling.kt
-package com.example.myapplication.presentation.ui.organizer
+package com.example.myapplication.presentation.ui.carpooling
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.verticalScroll

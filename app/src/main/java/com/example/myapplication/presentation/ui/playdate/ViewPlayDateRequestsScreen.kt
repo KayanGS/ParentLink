@@ -1,4 +1,4 @@
-package com.example.myapplication.presentation.ui.organizer
+package com.example.myapplication.presentation.ui.playdate
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState

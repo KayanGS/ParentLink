@@ -1,3 +1,4 @@
+// 📦 File: ParticipatingRequestCarpoolingScreen.kt
 package com.example.myapplication.presentation.ui.carpooling
 
 import android.widget.Toast
@@ -21,7 +22,8 @@ import java.util.*
 @Composable
 fun ParticipatingRequestCarpoolingScreen(
     eventRecordId: String,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onLogout: () -> Unit
 ) {
     val db = FirebaseFirestore.getInstance()
     val auth = FirebaseAuth.getInstance()
@@ -30,7 +32,6 @@ fun ParticipatingRequestCarpoolingScreen(
 
     val scrollState = rememberScrollState()
 
-    // Load Event + Parent Data
     var eventData by remember { mutableStateOf<Map<String, Any>?>(null) }
     var organizerName by remember { mutableStateOf("") }
     var parentName by remember { mutableStateOf("") }
@@ -44,8 +45,8 @@ fun ParticipatingRequestCarpoolingScreen(
     var specialNeedsDesc by remember { mutableStateOf("") }
     var requestedSeats by remember { mutableStateOf("1") }
     var requestSent by remember { mutableStateOf(false) }
-    var requiredReturn by remember { mutableStateOf("Yes") }
-    var requiredSeatsReturn by remember { mutableStateOf("1") }
+    var requiredReturn by remember { mutableStateOf("No") }
+    var requiredSeatsReturn by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         db.collection("Posted Carpooling Event Record").document(eventRecordId)
@@ -71,7 +72,13 @@ fun ParticipatingRequestCarpoolingScreen(
             .verticalScroll(scrollState)
             .padding(16.dp)
     ) {
-        ScreenHeader(title = "Request to Join Carpooling Event", onLogoutClick = { onBack() })
+        ScreenHeader(
+            title = "Request to Join Carpooling Event",
+            onLogoutClick = {
+                auth.signOut()
+                onLogout()
+            }
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -84,7 +91,6 @@ fun ParticipatingRequestCarpoolingScreen(
             Text("Destination: ${data["destination"]}")
             Text("Start Time: ${data["startTime"]}")
             Text("End Time: ${data["endTime"]}")
-            Text("Venue: ${data["pickup"]} to ${data["destination"]}")
             val returnYN = data["returnJourney"]
             if (returnYN == "Yes") {
                 Spacer(modifier = Modifier.height(4.dp))
@@ -93,17 +99,27 @@ fun ParticipatingRequestCarpoolingScreen(
                 Text("Return Start: ${data["returnStartTime"]}")
                 Text("Return End: ${data["returnEndTime"]}")
             }
+
             Spacer(modifier = Modifier.height(16.dp))
-
             Text("Participating Parent: $parentName $parentSurname")
-
             Text("Please, enter the following details:", fontSize = 16.sp)
-            OutlinedTextField(value = childName, onValueChange = { childName = it }, label = { Text("Child Name") }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = childAge, onValueChange = { childAge = it }, label = { Text("Child Age") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = siblingName, onValueChange = { siblingName = it }, label = { Text("Sibling Name (if any)") }, modifier = Modifier.fillMaxWidth())
+
+            OutlinedTextField(value = childName, onValueChange = { childName = it },
+                label = { Text("Child Name") }, modifier = Modifier.fillMaxWidth())
+
+            OutlinedTextField(value = childAge, onValueChange = { childAge = it },
+                label = { Text("Child Age") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth())
+
+            OutlinedTextField(value = siblingName, onValueChange = { siblingName = it },
+                label = { Text("Sibling Name (if any)") }, modifier = Modifier.fillMaxWidth())
 
             if (siblingName.isNotBlank()) {
-                OutlinedTextField(value = siblingAge, onValueChange = { siblingAge = it }, label = { Text("Sibling Age (if any)") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = siblingAge, onValueChange = { siblingAge = it },
+                    label = { Text("Sibling Age (if any)") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth())
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -116,12 +132,8 @@ fun ParticipatingRequestCarpoolingScreen(
             }
 
             if (specialNeeds == "Yes") {
-                OutlinedTextField(
-                    value = specialNeedsDesc,
-                    onValueChange = { specialNeedsDesc = it },
-                    label = { Text("Special Needs Description") },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                OutlinedTextField(value = specialNeedsDesc, onValueChange = { specialNeedsDesc = it },
+                    label = { Text("Special Needs Description") }, modifier = Modifier.fillMaxWidth())
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -136,9 +148,15 @@ fun ParticipatingRequestCarpoolingScreen(
             Spacer(modifier = Modifier.height(16.dp))
             Text("Required Return Journey?")
             Row {
-                RadioButton(selected = requiredReturn == "Yes", onClick = { requiredReturn = "Yes" })
+                RadioButton(selected = requiredReturn == "Yes", onClick = {
+                    requiredReturn = "Yes"
+                    requiredSeatsReturn = ""
+                })
                 Text("Yes", modifier = Modifier.padding(end = 16.dp))
-                RadioButton(selected = requiredReturn == "No", onClick = { requiredReturn = "No" })
+                RadioButton(selected = requiredReturn == "No", onClick = {
+                    requiredReturn = "No"
+                    requiredSeatsReturn = ""
+                })
                 Text("No")
             }
 
@@ -147,7 +165,9 @@ fun ParticipatingRequestCarpoolingScreen(
                 Text("Number of Seats Required on Return Journey:")
                 Row {
                     listOf("1", "2").forEach {
-                        RadioButton(selected = requiredSeatsReturn == it, onClick = { requiredSeatsReturn = it })
+                        RadioButton(selected = requiredSeatsReturn == it, onClick = {
+                            requiredSeatsReturn = it
+                        })
                         Text(it, modifier = Modifier.padding(end = 16.dp))
                     }
                 }
@@ -158,39 +178,57 @@ fun ParticipatingRequestCarpoolingScreen(
             Button(
                 onClick = {
                     val now = Date()
+
+                    // Clear return seat if no return selected
+                    if (requiredReturn != "Yes") {
+                        requiredSeatsReturn = ""
+                    }
+
                     val requestText = buildString {
                         append("Dear $organizerName,\n")
-                        append("I would like to request a place for my child $childName to participate in the carpooling titled \"${data["carpoolingTitle"]}\" scheduled on ${data["date"]} from ${data["pickup"]} to ${data["destination"]}. ")
-                        if (siblingName.isNotBlank()) append("$childName has a sibling named $siblingName. ")
-                        append("I am requesting $requestedSeats seat(s). ")
-                        if (specialNeeds == "Yes") append("Special needs: $specialNeedsDesc. ")
+                        append("I would like to place a request for my child $childName of age $childAge to participate in the posted by you event \"${data["carpoolingTitle"]}\", on ${data["date"]}, ${data["dayOfWeek"]}, starting at ${data["startTime"]}, with pick up point ${data["pickup"]} and destination ${data["destination"]}. ")
+
+                        if (siblingName.isNotBlank()) {
+                            append("$childName has a sibling of name $siblingName, age $siblingAge. ")
+                        }
+
+                        append("My request is for $requestedSeats seat(s) on the event. ")
+
+                        if (requiredReturn == "Yes" && requiredSeatsReturn.isNotBlank()) {
+                            append("I will require a Return Journey, as it has been offered, for $requiredSeatsReturn seat(s) as well. ")
+                        }
+
+                        if (specialNeeds == "Yes") {
+                            append("My child is of the following special needs: $specialNeedsDesc. ")
+                        }
+
                         append("\nKind regards,\n$parentName $parentSurname")
                     }
 
-                    db.collection("Request for posted carpooling event participation record")
-                        .add(
-                            mapOf(
-                                "participantParentId" to userId,
-                                "organizerId" to data["organizerId"],
-                                "carpoolingId" to eventRecordId,
-                                "weekCommenceDate" to data["weekCommenceDate"],
-                                "date" to data["date"],
-                                "childName" to childName,
-                                "childAge" to childAge,
-                                "siblingName" to siblingName.ifBlank { null },
-                                "siblingAge" to siblingAge.ifBlank { null },
-                                "specialNeeds" to specialNeeds,
-                                "specialNeedsDesc" to if (specialNeeds == "Yes") specialNeedsDesc else null,
-                                "requestedSeats" to requestedSeats,
-                                "status" to "created",
-                                "requestDate" to SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(now),
-                                "requestTime" to SimpleDateFormat("HH:mm", Locale.getDefault()).format(now),
-                                "requestText" to requestText,
-                                "requiredReturnJourney" to requiredReturn,
-                                "requiredSeatsReturn" to if (requiredReturn == "Yes") requiredSeatsReturn else "0",
+                    val requestData = mutableMapOf(
+                        "participantParentId" to userId,
+                        "organizerId" to data["organizerId"],
+                        "carpoolingId" to eventRecordId,
+                        "weekCommenceDate" to data["weekCommenceDate"],
+                        "date" to data["date"],
+                        "childName" to childName,
+                        "childAge" to childAge,
+                        "siblingName" to siblingName.ifBlank { null },
+                        "siblingAge" to siblingAge.ifBlank { null },
+                        "specialNeeds" to specialNeeds,
+                        "specialNeedsDesc" to if (specialNeeds == "Yes") specialNeedsDesc else null,
+                        "requestedSeats" to requestedSeats,
+                        "status" to "created",
+                        "requestDate" to SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(now),
+                        "requestTime" to SimpleDateFormat("HH:mm", Locale.getDefault()).format(now),
+                        "requestText" to requestText,
+                        "requiredReturnJourney" to if (requiredReturn == "Yes") "Yes" else null,
+                        "requiredSeatsReturn" to if (requiredReturn == "Yes" && requiredSeatsReturn.isNotBlank()) requiredSeatsReturn else null,
+                    )
 
-                                )
-                        ).addOnSuccessListener {
+                    db.collection("Request for posted carpooling event participation record")
+                        .add(requestData)
+                        .addOnSuccessListener {
                             requestSent = true
                             Toast.makeText(context, "Carpooling request sent!", Toast.LENGTH_LONG).show()
                         }
@@ -204,6 +242,7 @@ fun ParticipatingRequestCarpoolingScreen(
             if (requestSent) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text("Request sent successfully! You can now press the button below to go back.")
+
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
                     Text("Close")

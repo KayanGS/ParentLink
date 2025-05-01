@@ -1,5 +1,5 @@
 // ParticipatingPlayDateNotificationDetailsScreen.kt
-package com.example.myapplication.presentation.ui.participating
+package com.example.myapplication.presentation.ui.playdate
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
