@@ -167,13 +167,16 @@ fun ViewCarpoolingRequestDetailsScreen(
                 showPopup = true
 
                 onConfirmAction = {
+                    val carpoolingId = requestData!!["carpoolingId"] as String
+                    val requestedSeats = (requestData!!["requestedSeats"] as? String)?.toIntOrNull() ?: 1
+
                     db.collection("Notification_of_carpooling_request_acceptance_rejection")
                         .add(
                             mapOf(
                                 "requestId" to requestId,
                                 "organizerId" to eventData!!["organizerId"],
                                 "participantParentId" to requestData!!["participantParentId"],
-                                "carpoolingId" to requestData!!["carpoolingId"],
+                                "carpoolingId" to carpoolingId,
                                 "weekCommenceDate" to eventData!!["weekCommenceDate"],
                                 "date" to eventData!!["date"],
                                 "status" to "accepted",
@@ -183,9 +186,19 @@ fun ViewCarpoolingRequestDetailsScreen(
                             )
                         )
 
-                    db.collection("Request for posted carpooling event participation record").document(requestId)
+                    db.collection("Request for posted carpooling event participation record")
+                        .document(requestId)
                         .update("status", "accepted")
+
+                    // Reduce remaining carpooling seats
+                    val remaining = (eventData!!["remainingSeats"] as? String)?.toIntOrNull() ?: 0
+                    val updatedRemaining = (remaining - requestedSeats).coerceAtLeast(0)
+
+                    db.collection("Posted Carpooling Event Record")
+                        .document(carpoolingId)
+                        .update("remainingSeats", updatedRemaining.toString())
                 }
+
             }) {
                 Text("Accept Request")
             }

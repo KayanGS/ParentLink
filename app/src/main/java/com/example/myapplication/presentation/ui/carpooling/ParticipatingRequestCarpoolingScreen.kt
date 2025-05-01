@@ -85,12 +85,14 @@ fun ParticipatingRequestCarpoolingScreen(
         eventData?.let { data ->
             Text("Carpooling Title: ${data["carpoolingTitle"]}")
             Text("Organising Parent: $organizerName")
+            Text("Age Group Suitability: ${data["ageGroup"]}")
             Text("Date: ${data["date"]}")
             Text("Day of Week: ${data["dayOfWeek"]}")
+            Text("Start Time: ${data["startTime"]}")
             Text("Pick-up: ${data["pickup"]}")
             Text("Destination: ${data["destination"]}")
-            Text("Start Time: ${data["startTime"]}")
-            Text("End Time: ${data["endTime"]}")
+            Text("Maximum Number of Seats Available: ${data["maxSeats"]}")
+            Text("Remaining Number of Seats Available: ${data["remainingSeats"]}")
             val returnYN = data["returnJourney"]
             if (returnYN == "Yes") {
                 Spacer(modifier = Modifier.height(4.dp))
